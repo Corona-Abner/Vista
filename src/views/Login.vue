@@ -53,9 +53,13 @@ export default {
     }),
     methods: {
         Mostrar() {
-            this.$store.commit("mostrarLoading", {
+            
+            this.$store.commit("mostrarSnack", {
                 titulo: 'Iniciando Sesión',
-                estado: true
+                estado: true,
+                tiempo: 1000,
+                color:'error',
+                modo:'verti'
             });
         }
     }

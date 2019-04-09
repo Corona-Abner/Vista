@@ -20,6 +20,11 @@ export default new Router({
       path: '/about',
       name: 'about',
       component: diferida('About') 
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: diferida('Login') 
     }
   ]
 })
