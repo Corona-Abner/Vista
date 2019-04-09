@@ -1,35 +1,58 @@
 <template>
-  <v-app>
-    <v-toolbar app>
-      <v-toolbar-title class="headline text-uppercase">
-        <span>Vuetify</span>
-        <span class="font-weight-light">MATERIAL DESIGN</span>
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn
-        flat
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>open_in_new</v-icon>
-      </v-btn>
-    </v-toolbar>
+<div id="app">
+    <!-- Aplicacion principal -->
+    <v-app id="inspire">
+        <!-- Menu del lado Izquierdo -->
+        <v-navigation-drawer v-model="diseño" fixed :mini-variant="mini" absolute dark temporary app>
+            <!-- Listado de menu -->
+            <v-list dense>
+                <!-- Recorre todos los elemntos -->
+                <v-list-tile v-for="Elemento in Elementos" :to="Elemento.Ruta" :key="Elemento.Titulo">
+                    <!-- Icono del elemento de la lista -->
+                    <v-list-tile-action>
+                        <v-icon>{{ Elemento.Icono }}</v-icon>
+                    </v-list-tile-action>
+                    <!-- Contenido del elemento de la lista -->
+                    <v-list-tile-content>
+                        <v-list-tile-title>{{ Elemento.Titulo }}</v-list-tile-title>
+                    </v-list-tile-content>
+                </v-list-tile>
+            </v-list>
+        </v-navigation-drawer>
+        <v-toolbar clipped-left dark>
+         
+                <v-toolbar-side-icon class="hidden-md-and-up" @click.stop="diseño = !diseño"></v-toolbar-side-icon>
+                <v-spacer class="hidden-md-and-up"></v-spacer>
+                <v-flex xs1>
+                    <v-img :src="require('@/assets/logo.svg')" height="45" contain></v-img>
+                </v-flex>
+          
 
-    <v-content>
-      <router-view/>
-    </v-content>
-  </v-app>
+        </v-toolbar>
+    </v-app>
+</div>
 </template>
 
-<script>
+<!-- Script de la pagina App.vue -->
 
+<script>
+//Importamos un mape de estado para la store
+import {
+    mapState
+} from "vuex";
 export default {
-  name: 'App',
-  data () {
-    return {
-      //
+    name: 'App',
+    data() {
+        return {
+            //Variable para naviagtion drawer
+            diseño: null,
+            mini: true,
+            Elementos: []
+        }
+    },
+    computed: {
+        //Mapeo de los estados de la Store
+        ...mapState(['Loading'])
     }
-  }
 }
 </script>
