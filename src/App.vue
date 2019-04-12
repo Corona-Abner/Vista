@@ -3,13 +3,13 @@
     <!-- Aplicacion principal -->
     <v-app id="inspire">
         <!-- Solo en moviles: menu del lado Izquierdo -->
-        <v-navigation-drawer v-model="diseño" fixed :mini-variant="mini" absolute  temporary dark app>
+        <v-navigation-drawer v-model="diseño" fixed :mini-variant="mini" absolute temporary dark app>
             <!-- Listado de menu -->
-            <v-list dense>
+            <v-list>
                 <v-list-tile>
                     <v-list-tile-action>
                         <v-btn icon @click.stop="mini = !mini">
-                            
+
                             <v-icon v-if="mini">chevron_right</v-icon>
                             <v-icon v-else>chevron_left</v-icon>
 
@@ -18,17 +18,37 @@
                 </v-list-tile>
                 <v-divider></v-divider>
                 <!-- Recorre todos los elementos -->
-                <v-list-tile v-for="Elemento in Elementos" :to="Elemento.ruta" :key="Elemento.titulo">
+                <div v-for="Elemento in Elementos" :key="Elemento.titulo">
+                   
+                    <v-list-group v-if="Elemento.items" :prepend-icon="Elemento.icono" >
+                        <template v-slot:activator>
+                            <v-list-tile>
+                                <v-list-tile-title>{{Elemento.titulo}}</v-list-tile-title>
+                            </v-list-tile>
+                        </template>
+                        
+                        <v-list-tile v-for="item in Elemento.items" :key="item.titulo" :to="item.ruta">
+                            <v-list-tile-action>
+                                <v-icon small>{{ item.icono }}</v-icon>
+                            </v-list-tile-action>
+                            <!-- Contenido del elemento de la lista -->
+                            <v-list-tile-content>
+                                <v-list-tile-title ><h4><small>{{ item.titulo }}</small></h4></v-list-tile-title>
+                            </v-list-tile-content>
+                        </v-list-tile>
+                    </v-list-group>
+                    <v-list-tile v-else :to="Elemento.ruta">
+                        <!-- Icono del elemento de la lista -->
+                        <v-list-tile-action>
+                            <v-icon>{{ Elemento.icono }}</v-icon>
+                        </v-list-tile-action>
+                        <!-- Contenido del elemento de la lista -->
+                        <v-list-tile-content>
+                            <v-list-tile-title>{{ Elemento.titulo }}</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+                </div>
 
-                    <!-- Icono del elemento de la lista -->
-                    <v-list-tile-action>
-                        <v-icon>{{ Elemento.icono }}</v-icon>
-                    </v-list-tile-action>
-                    <!-- Contenido del elemento de la lista -->
-                    <v-list-tile-content>
-                        <v-list-tile-title>{{ Elemento.titulo }}</v-list-tile-title>
-                    </v-list-tile-content>
-                </v-list-tile>
             </v-list>
         </v-navigation-drawer>
         <!-- Barra de herrmientas -->
@@ -44,7 +64,28 @@
             </v-flex>
             <!-- Solo Escritorio: Recorre todos los elementos -->
             <v-toolbar-items class="hidden-sm-and-down" v-for="Elemento in Elementos" :key="Elemento.titulo">
-                <v-btn flat :to="Elemento.ruta">
+
+                <v-btn flat v-if="Elemento.items">
+                    <v-menu>
+                        <template v-slot:activator="{ on }">
+                            <div v-on="on">
+                                <v-icon left>{{Elemento.icono}}</v-icon>
+                                {{Elemento.titulo}}
+                            </div>
+
+                        </template>
+
+                        <v-list>
+                            <v-list-tile v-for="item in Elemento.items" :key="item.titulo" :to="item.ruta">
+                                <v-list-tile-action>
+                                    <v-icon small>{{ item.icono }}</v-icon>
+                                </v-list-tile-action>
+                                <v-list-tile-title v-text="item.titulo"></v-list-tile-title>
+                            </v-list-tile>
+                        </v-list>
+                    </v-menu>
+                </v-btn>
+                <v-btn flat v-else :to="Elemento.ruta">
                     <v-icon left>{{Elemento.icono}}</v-icon>
                     {{Elemento.titulo}}
                 </v-btn>
@@ -88,10 +129,21 @@ export default {
             diseño: null,
             mini: true,
             Elementos: [{
-                titulo: 'Inicio',
-                ruta: '/',
-                icono: 'home'
-            }, ],
+                    titulo: 'Inicio',
+                    ruta: '/',
+                    icono: 'home',
+                    items: null
+                },
+                {
+                    titulo: 'Inventario',
+                    icono: 'shopping_cart',
+                    items: [{
+                        titulo: 'Kits',
+                        icono: 'speaker_group',
+                        ruta: '/kits'
+                    }]
+                }
+            ],
             snack: true
         }
     },
