@@ -135,12 +135,33 @@ export default {
                     items: null
                 },
                 {
+                    titulo: 'Usuarios',
+                    ruta: '/usuarios',
+                    icono: 'supervisor_account',
+                    items: null
+                },
+                {
                     titulo: 'Inventario',
                     icono: 'shopping_cart',
                     items: [{
+                        titulo: 'Productos',
+                        icono: 'speaker',
+                        ruta: '/productos'
+                    },
+                        {
                         titulo: 'Kits',
                         icono: 'speaker_group',
                         ruta: '/kits'
+                    },
+                    {
+                        titulo: 'Lineas',
+                        icono: 'confirmation_number',
+                        ruta: '/lineas'
+                    },
+                    {
+                        titulo: 'Marcas',
+                        icono: 'local_offer',
+                        ruta: '/marcas'
                     }]
                 }
             ],

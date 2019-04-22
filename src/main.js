@@ -6,7 +6,9 @@ import store from './store'
 
 import axios from 'axios'
 import VueAxios from 'vue-axios'
- 
+
+axios.defaults.baseURL="https://localhost:44349/api/" 
+
 Vue.use(VueAxios, axios)
 Vue.config.productionTip = false
 

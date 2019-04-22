@@ -30,12 +30,8 @@
                                 <v-container grid-list-md>
                                     <v-layout wrap>
                                         <v-flex xs12 sm12 md12>
-                                            <div v-if=" this.Indice ==-1">
-                                                <v-text-field type="text" v-model="Item_editado.articulo" label="Nombre" counter maxlength="15"></v-text-field>
-                                            </div>
-                                            <div v-else>
-                                                <v-text-field type="text" disabled v-model="Item_editado.articulo" label="Nombre" counter maxlength="15"></v-text-field>
-                                            </div>
+                                            <v-text-field type="text" :disabled="!(this.Indice ==-1)" v-model="Item_editado.articulo" label="Nombre" counter maxlength="15"></v-text-field>
+
                                         </v-flex>
                                         <v-flex xs12 sm12 md12>
                                             <v-text-field type="text" v-model="Item_editado.descrip" label="Descripcion" counter maxlength="50"></v-text-field>
@@ -47,34 +43,26 @@
                                             <v-select :items="Marcas" item-text="marca" v-model="Item_editado.marca" label="Marca"></v-select>
                                         </v-flex>
                                         <v-flex xs6>
-                                            <v-text-field type="number" :min="0" v-model="Item_editado.costo" label="Costo"></v-text-field>
-                                        </v-flex>
-                                        <v-flex xs6>
                                             <v-text-field type="number" :min="0" v-model="Item_editado.precio1" label="Precio"></v-text-field>
                                         </v-flex>
                                         <v-flex xs6>
-                                            <v-text-field type="text" v-model="Item_editado.claveprodserv" label="Clave Servicio" counter maxlength="10"></v-text-field>
-                                        </v-flex>
-                                        <v-flex xs6>
-                                            <v-text-field type="text" v-model="Item_editado.claveunidad" label="Clave Unidad" counter maxlength="10"></v-text-field>
-                                        </v-flex>
-                                        <v-flex xs12>
                                             <v-text-field type="number" :min="1" v-model="Item_editado.inventariopiezas" label="Cantidad"></v-text-field>
                                         </v-flex>
-                                        
+
+                                        <v-flex xs6>
+                                            <v-text-field type="number" :min="1" v-model="Item_editado.claveprodserv" label="Clave Servicio" counter maxlength="10"></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs6>
+                                            <v-text-field type="text" v-model="Item_editado.claveunidad" label="Clave Unidad" counter maxlength="6"></v-text-field>
+                                        </v-flex>
+
                                         <!-- Checkboxes -->
 
-                                        <v-flex xs3>
-                                            <v-checkbox color="primary" :label="`1`"></v-checkbox>
+                                        <v-flex xs12>
+                                            <v-checkbox color="primary" v-model="Item_editado.paraventa" label="Para venta"></v-checkbox>
                                         </v-flex>
-                                        <v-flex xs3>
-                                            <v-checkbox color="primary" :label="`2`"></v-checkbox>
-                                        </v-flex>
-                                        <v-flex xs3>
-                                            <v-checkbox color="primary" :label="`3`"></v-checkbox>
-                                        </v-flex>
-                                        <v-flex xs3>
-                                            <v-checkbox color="primary" :label="`4`"></v-checkbox>
+                                        <v-flex xs12>
+                                            <v-checkbox color="primary" v-model="Item_editado.invent" label="Control inventario"></v-checkbox>
                                         </v-flex>
 
                                         <!-- Mensaje de validacion -->
@@ -113,16 +101,16 @@
                     </v-dialog>
                 </v-toolbar>
                 <!-- Tabla de datos -->
-                <v-data-table :loading="Cargando" :headers="Encabezados" :items="Productos" :search="Busqueda" class="elevation-1" rows-per-page-text="Numero de filas" no-results-text="No se ha encontrado resultados">
+                <v-data-table :loading="Cargando" :headers="Encabezados" :items="Productos" :search="Busqueda"  rows-per-page-text="Numero de filas" no-results-text="No se ha encontrado resultados">
                     <!-- Barra de progreso -->
-                    <v-progress-linear v-slot:progress  indeterminate></v-progress-linear>
+                    <v-progress-linear v-slot:progress indeterminate></v-progress-linear>
                     <!-- lista de datos -->
                     <template v-slot:items="props">
                         <td>{{ props.item.articulo }}</td>
                         <td>{{ props.item.descrip }}</td>
                         <td>{{ props.item.linea}}</td>
                         <td>{{ props.item.marca }}</td>
-                        <td>{{props.item.inventariopiezas}}</td>
+                        <td>${{ props.item.precio1 }} / {{ props.item.inventariopiezas }}</td>
                         <td>
                             <!-- Boton editar -->
                             <v-icon small class="mr-2" @click="Editar(props.item)">
@@ -133,6 +121,14 @@
                                 delete
                             </v-icon>
                         </td>
+                    </template>
+                    <template v-slot:no-results>
+                        <v-flex xs12 sm12 text-xs-center>
+                            <v-alert :value="true" color="error" icon="warning">
+                                No se encontraron resultados para "{{ Busqueda }}".
+                            </v-alert>
+                        </v-flex>
+
                     </template>
                     <!-- Mensaje si no se encontraron datos -->
                     <template v-slot:no-data>
@@ -182,11 +178,11 @@ export default {
         //Encabezados para la tabla de la pestaña 1
         Encabezados: [{
                 text: 'Nombre',
-                value: 'nombre'
+                value: 'articulo'
             },
             {
                 text: 'Descripcion',
-                value: 'descripcion'
+                value: 'descrip'
             },
             {
                 text: 'Linea',
@@ -197,8 +193,8 @@ export default {
                 value: 'marca'
             },
             {
-                text: 'Cantidad',
-                value: 'cantidad'
+                text: 'Precio/Cantidad',
+                value: 'precio1'
             },
             {
                 text: 'Opciones',
@@ -225,24 +221,24 @@ export default {
             "existencia": 0,
             "costoU": 0,
             "costo": 0,
-            "unidad": "0",
+            "unidad": null,
             "porRecib": 0,
             "porSurt": 0,
-            "impuesto": "0",
+            "impuesto": "IVA",
             "minimo": 0,
             "maximo": 0,
-            "observ": "0",
+            "observ": null,
             "costoStd": 0,
             "kit": 0,
             "serie": 0,
             "lote": 0,
-            "invent": 0,
-            "imagen": "0",
-            "paraventa": 0,
-            "url": "0",
+            "invent": 1,
+            "imagen": null,
+            "paraventa": 1,
+            "url": null,
             "curso": 0,
-            "usuario": "0",
-            "usuhora": "0",
+            "usuario": null,
+            "usuhora": null,
             "usufecha": "2019-03-07T00:00:00",
             "exportado": 0,
             "enVenta": 0,
@@ -262,10 +258,10 @@ export default {
             "u9": 0,
             "u10": 0,
             "acaja": 0,
-            "modificaprecio": "0",
+            "modificaprecio": null,
             "fraccionario": 0,
             "iespecial": 0,
-            "ubicacion": "0",
+            "ubicacion": null,
             "c2": 0,
             "c3": 0,
             "c4": 0,
@@ -276,32 +272,32 @@ export default {
             "c9": 0,
             "c10": 0,
             "movimientos": 0,
-            "clasificacion": "0",
+            "clasificacion": null,
             "rop": 0,
             "rotacion": 0,
-            "clasifant": "0",
+            "clasifant": null,
             "eoq": 0,
             "etiquetas": 0,
-            "modelo": "0",
-            "color": "0",
-            "talla": "0",
+            "modelo": null,
+            "color": null,
+            "talla": null,
             "speso": 0,
-            "etiqueta": "0",
+            "etiqueta": null,
             "numero": 0,
             "carton": 0,
-            "ubicaetiq": "0",
-            "unidadrecibe": "0",
-            "unidadempaque": "0",
+            "ubicaetiq": null,
+            "unidadrecibe": null,
+            "unidadempaque": null,
             "sinvolumen": 0,
             "presentacion": 0,
             "servicio": 0,
             "numeroservicios": 0,
-            "claveproveedor": "0",
+            "claveproveedor": null,
             "dp": 0,
-            "familia": "0",
-            "subfamilia": "0",
-            "subfam1": "0",
-            "subfam2": "0",
+            "familia": null,
+            "subfamilia": null,
+            "subfam1": null,
+            "subfam2": null,
             "entradas": 0,
             "salidas": 0,
             "cantent": 0,
@@ -315,32 +311,33 @@ export default {
             "donativo": 0,
             "costopeps": 0,
             "costoueps": 0,
-            "contenido": "0",
-            "presentacionextra": "0",
+            "contenido": null,
+            "presentacionextra": null,
             "pesoextra": 0,
-            "autor": "0",
-            "tema": "0",
-            "editorial": "0",
-            "fabricante": "0",
+            "autor": null,
+            "tema": null,
+            "editorial": null,
+            "fabricante": "SYS",
             "preciousd": 0,
             "costousd": 0,
             "puntos": 0,
             "autocodigo": 0,
-            "inventariopiezas": 1,
-            "diasstockmaximo": 0,
-            "diasstockminimo": 0,
-            "requerimiento": 0,
+            "inventariopiezas": null,
+            "diasstockmaximo": null,
+            "diasstockminimo": null,
+            "requerimiento": null,
             "tiempoAire": 0,
             "ssmaTimeStamp": 'NULL',
             "ensambladoenlinea": 0,
-            "iepslitro": 0,
-            "clases": "0",
-            "claveprodserv": "",
-            "claveunidad": ""
+            "iepslitro": null,
+            "claveprodserv": null,
+            "claveunidad": null,
+            "lineaNavigation": null,
+            "marcaNavigation": null
         },
 
         //Variable para la api
-        API_URL: 'prods/listar/productos'
+        API_URL: 'prods/'
     }),
     //Metodo para utilzar propiedades computadas
     computed: {
@@ -374,7 +371,7 @@ export default {
         Listar() {
             this.Cargando = true;
             this.Productos = [];
-            axios.get(this.API_URL).then((response) => {
+            axios.get(this.API_URL + "listarp").then((response) => {
                 this.Productos = response.data;
                 this.Cargando = false;
             }).catch((error) => {
@@ -384,7 +381,7 @@ export default {
         },
         //metodo para editar un elemento
         Editar(item) {
-            
+
             this.Indice = this.Productos.indexOf(item);
             this.Item_editado = item;
             delete this.Item_editado.autocodigo;
@@ -412,13 +409,12 @@ export default {
         },
         //Metodo par aceptar al editar y agregar elementos
         Aceptar() {
-            console.log(this.Busqueda);
             this.Validar();
             if (this.Validacion) {
                 return
             }
 
-            this.Item_editado.usuario = this.$store.state.Login.usuario.idusuario;
+            //this.Item_editado.usuario = this.$store.state.Login.usuario.idusuario;
             //Validar
             if (this.Indice > -1) {
                 //Editar
@@ -506,24 +502,24 @@ export default {
                 "existencia": 0,
                 "costoU": 0,
                 "costo": 0,
-                "unidad": "0",
+                "unidad": null,
                 "porRecib": 0,
                 "porSurt": 0,
-                "impuesto": "0",
+                "impuesto": "IVA",
                 "minimo": 0,
                 "maximo": 0,
-                "observ": "0",
+                "observ": null,
                 "costoStd": 0,
                 "kit": 0,
                 "serie": 0,
                 "lote": 0,
-                "invent": 0,
-                "imagen": "0",
-                "paraventa": 0,
-                "url": "0",
+                "invent": 1,
+                "imagen": null,
+                "paraventa": 1,
+                "url": null,
                 "curso": 0,
-                "usuario": "0",
-                "usuhora": "0",
+                "usuario": null,
+                "usuhora": null,
                 "usufecha": "2019-03-07T00:00:00",
                 "exportado": 0,
                 "enVenta": 0,
@@ -543,10 +539,10 @@ export default {
                 "u9": 0,
                 "u10": 0,
                 "acaja": 0,
-                "modificaprecio": "0",
+                "modificaprecio": null,
                 "fraccionario": 0,
                 "iespecial": 0,
-                "ubicacion": "0",
+                "ubicacion": null,
                 "c2": 0,
                 "c3": 0,
                 "c4": 0,
@@ -557,32 +553,32 @@ export default {
                 "c9": 0,
                 "c10": 0,
                 "movimientos": 0,
-                "clasificacion": "0",
+                "clasificacion": null,
                 "rop": 0,
                 "rotacion": 0,
-                "clasifant": "0",
+                "clasifant": null,
                 "eoq": 0,
                 "etiquetas": 0,
-                "modelo": "0",
-                "color": "0",
-                "talla": "0",
+                "modelo": null,
+                "color": null,
+                "talla": null,
                 "speso": 0,
-                "etiqueta": "0",
+                "etiqueta": null,
                 "numero": 0,
                 "carton": 0,
-                "ubicaetiq": "0",
-                "unidadrecibe": "0",
-                "unidadempaque": "0",
+                "ubicaetiq": null,
+                "unidadrecibe": null,
+                "unidadempaque": null,
                 "sinvolumen": 0,
                 "presentacion": 0,
                 "servicio": 0,
                 "numeroservicios": 0,
-                "claveproveedor": "0",
+                "claveproveedor": null,
                 "dp": 0,
-                "familia": "0",
-                "subfamilia": "0",
-                "subfam1": "0",
-                "subfam2": "0",
+                "familia": null,
+                "subfamilia": null,
+                "subfam1": null,
+                "subfam2": null,
                 "entradas": 0,
                 "salidas": 0,
                 "cantent": 0,
@@ -596,28 +592,29 @@ export default {
                 "donativo": 0,
                 "costopeps": 0,
                 "costoueps": 0,
-                "contenido": "0",
-                "presentacionextra": "0",
+                "contenido": null,
+                "presentacionextra": null,
                 "pesoextra": 0,
-                "autor": "0",
-                "tema": "0",
-                "editorial": "0",
-                "fabricante": "0",
+                "autor": null,
+                "tema": null,
+                "editorial": null,
+                "fabricante": "SYS",
                 "preciousd": 0,
                 "costousd": 0,
                 "puntos": 0,
                 "autocodigo": 0,
-                "inventariopiezas": 1,
-                "diasstockmaximo": 0,
-                "diasstockminimo": 0,
-                "requerimiento": 0,
+                "inventariopiezas": null,
+                "diasstockmaximo": null,
+                "diasstockminimo": null,
+                "requerimiento": null,
                 "tiempoAire": 0,
                 "ssmaTimeStamp": 'NULL',
                 "ensambladoenlinea": 0,
-                "iepslitro": 0,
-                "clases": "0",
-                "claveprodserv": "",
-                "claveunidad": ""
+                "iepslitro": null,
+                "claveprodserv": null,
+                "claveunidad": null,
+                "lineaNavigation": null,
+                "marcaNavigation": null
             };
         },
     }

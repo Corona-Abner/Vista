@@ -30,25 +30,22 @@
                                 <v-container grid-list-md>
                                     <v-layout wrap>
                                         <v-flex xs12 sm12 md12>
-                                            <div v-if=" this.Indice ==-1">
-                                                <v-text-field type="text" v-model="Item_editado.usuario" label="Usuario" counter maxlength="10"></v-text-field>
-                                            </div>
-                                            <div v-else>
-                                                <v-text-field type="text" disabled v-model="Item_editado.usuario" label="Usuario" counter maxlength="10"></v-text-field>
-                                            </div>
+                                            
+                                                <v-text-field type="text" :disabled="!(Indice === -1)" v-model="Item_editado.usuario" label="Usuario" counter maxlength="10"></v-text-field>
+                                            
                                         </v-flex>
                                         <v-flex xs12 sm12 md12>
                                             <v-form>
-                                                <v-text-field v-model="Item_editado.clave" label="Contraseña" type="password" counter maxlength="8">
+                                                <v-text-field :disabled="!Item_editado.supervisor" v-model="Item_editado.clave" label="Contraseña" type="password" counter maxlength="8">
                                                 </v-text-field>
                                             </v-form>
                                         </v-flex>
                                         <v-flex xs12>
-                                            <v-text-field type="text" v-model="Item_editado.nombre" autocomplete="new-password"  label="Nombre" counter maxlength="20"></v-text-field>
+                                            <v-text-field type="text" v-model="Item_editado.nombre" autocomplete="new-password" label="Nombre" counter maxlength="20"></v-text-field>
                                         </v-flex>
 
                                         <v-flex xs12>
-                                            <v-text-field type="text" v-model="Item_editado.area" label="Area" counter maxlength="10"></v-text-field>
+                                            <v-text-field type="text" v-model="Item_editado.area" label="Area" counter maxlength="15"></v-text-field>
                                         </v-flex>
                                         <v-flex xs3>
                                             <v-checkbox v-model="Item_editado.supervisor" color="primary" :label="`Supervisor`"></v-checkbox>
@@ -216,7 +213,10 @@ export default {
             "gerenciales": 0,
             "vendedor": 'SYS',
             "surtirpedidos": 0,
-            "cobrador": 'SYS'
+            "cobrador": 'SYS',
+            "passwordHash": null,
+            "passwordSalt": null,
+            "tipo": null
         },
 
         //Variable para la api
@@ -284,7 +284,9 @@ export default {
             if (this.Validacion) {
                 return
             }
-
+            if(!this.Item_editado.supervisor){
+                 this.Item_editado.clave="";
+            }
             //Validar
             if (this.Indice > -1) {
                 //Editar
@@ -376,7 +378,10 @@ export default {
                 "gerenciales": 0,
                 "vendedor": 'SYS',
                 "surtirpedidos": 0,
-                "cobrador": 'SYS'
+                "cobrador": 'SYS',
+                "passwordHash": null,
+                "passwordSalt": null,
+                "tipo": null
             };
 
         },

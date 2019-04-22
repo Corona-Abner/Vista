@@ -12,22 +12,96 @@
                     <v-spacer></v-spacer>
                     <!-- Cuadro de busqueda -->
                     <v-text-field v-model="Busqueda" append-icon="search" label="Busquedas" single-line hide-details></v-text-field>
+                    <!-- Spaciador -->
+                    <v-spacer></v-spacer>
+                    <!-- Dialogo para agregar o editar -->
+                    <v-dialog v-model="Dialogo" max-width="500px">
+                        <!-- Boton para activar el dialogo -->
+                        <v-btn slot="activator" color="primary" class="mb-2">Nuevo</v-btn>
+                        <!-- Contenido del dialogo -->
+                        <v-card>
+                            <!-- Titulo -->
+                            <v-card-title>
+                                <span class="headline">{{ Titulo_dialogo }}</span>
+                            </v-card-title>
+                            <!-- Datos -->
+                            <v-card-text>
+                                <v-container grid-list-md>
+                                    <v-layout wrap>
+                                        <v-flex xs12 sm12 md12>
+                                            <v-text-field type="number" :disabled="!this.Indice ==-1" v-model="Item_editado.articulo" label="Nombre" :min="1" prefix="KIT"></v-text-field>
 
+                                        </v-flex>
+                                        <v-flex xs12 sm12 md12>
+                                            <v-text-field type="text" v-model="Item_editado.descrip" label="Descripcion" counter maxlength="50"></v-text-field>
+                                        </v-flex>
+                                        <v-layout align-center justify-center row fill-height>
+                                            <v-flex xs6>
+                                                <v-autocomplete v-model="Componente" :items="Productos" item-text="articulo" label="Producto" prepend-icon="search">
+                                                </v-autocomplete>
+                                            </v-flex>
+                                            <v-flex xs2>
+                                                <v-btn small fab @click="LOL(Componente)">
+                                                    <v-icon>add</v-icon>
+                                                </v-btn>
+                                            </v-flex>
+                                        </v-layout>
+                                        <v-data-table :headers="Encabezados2" :items="Prods" rows-per-page-text="Numero de filas" no-results-text="No hay comp0nentes en el kit">
+                                            <!-- lista de datos -->
+                                            <template v-slot:items="props">
+
+                                                <td>{{ props.item.articulo }}</td>
+                                                <td>{{ props.item.precio1 }}</td>
+
+                                                <td>{{props.item.inventariopiezas}}</td>
+
+                                                <td>
+                                                    <!-- Boton eliminar -->
+                                                    <v-icon small @click="Eliminar(props.item)">
+                                                        delete
+                                                    </v-icon>
+
+                                                </td>
+
+                                            </template>
+                                        </v-data-table>
+                                        <!-- Checkboxes -->
+
+                                        <v-flex xs12>
+                                            <v-checkbox color="primary" v-model="Item_editado.paraventa" label="Para venta"></v-checkbox>
+                                        </v-flex>
+                                        <v-flex xs12>
+                                            <v-checkbox color="primary" v-model="Item_editado.invent" label="Control inventario"></v-checkbox>
+                                        </v-flex>
+
+                                        <!-- Mensaje de validacion -->
+                                        <v-flex xs12 v-show="Validacion">
+                                            <div class="red--text" v-for="Mensaje in Mensajes" :key="Mensaje" v-text="Mensaje">
+                                            </div>
+                                        </v-flex>
+                                    </v-layout>
+                                </v-container>
+                            </v-card-text>
+                            <!-- Opciones para cerrar y aceptar -->
+                            <v-card-actions>
+
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                 </v-toolbar>
                 <v-data-table :loading="Cargando" :headers="Encabezados" :items="Kits" :search="Busqueda" class="elevation-1" rows-per-page-text="Numero de filas" no-results-text="No se ha encontrado resultados">
                     <!-- Barra de progreso -->
-                    <v-progress-linear v-slot:progress  indeterminate></v-progress-linear>
+                    <v-progress-linear v-slot:progress indeterminate></v-progress-linear>
                     <!-- lista de datos -->
-                    <template v-slot:items="props" >
-                        
-                        
+                    <template v-slot:items="props">
+
                         <td>{{ props.item.articulo }}</td>
-                        <td >{{ props.item.descrip }}</td>
-                        
-                        <td >{{props.item.inventariopiezas}}</td>
-                        
-                        <td >
-                             <v-icon small class="mr-2" @click="Eliminar(props.item)">
+                        <td>{{ props.item.descrip }}</td>
+
+                        <td>{{props.item.inventariopiezas}}</td>
+
+                        <td>
+                            <v-icon small class="mr-2" @click="Eliminar(props.item)">
                                 info
                             </v-icon>
                             <!-- Boton editar -->
@@ -38,11 +112,9 @@
                             <v-icon small @click="Eliminar(props.item)">
                                 delete
                             </v-icon>
-                           
+
                         </td>
-                            
-                            
-                           
+
                     </template>
                     <!-- Mensaje si no se encontraron datos -->
                     <template v-slot:no-data>
@@ -84,12 +156,33 @@ export default {
         Mensajes: [],
         //Elementos para la tabla de la pestaña 1
         Kits: [],
+        Productos: [],
+        Prods: [],
+        Componente: '',
         Encabezados: [{
+                text: 'Nombre',
+                value: 'Mombre'
+            },
+            {
+                text: 'Descripcion',
+                value: 'Descripcion'
+            },
+            {
+                text: 'Cantidad',
+                value: 'Cantidad'
+            },
+            {
+                text: 'Opciones',
+                value: 'Opciones',
+                sortable: false
+            }
+        ],
+        Encabezados2: [{
                 text: 'Nombre',
                 value: 'nombre'
             },
             {
-                text: 'Descripcion',
+                text: 'Precio',
                 value: 'descripcion'
             },
             {
@@ -120,24 +213,24 @@ export default {
             "existencia": 0,
             "costoU": 0,
             "costo": 0,
-            "unidad": "0",
+            "unidad": null,
             "porRecib": 0,
             "porSurt": 0,
-            "impuesto": "0",
+            "impuesto": "IVA",
             "minimo": 0,
             "maximo": 0,
-            "observ": "0",
+            "observ": null,
             "costoStd": 0,
-            "kit": 1,
+            "kit": 0,
             "serie": 0,
             "lote": 0,
-            "invent": 0,
-            "imagen": "0",
-            "paraventa": 0,
-            "url": "0",
+            "invent": 1,
+            "imagen": null,
+            "paraventa": 1,
+            "url": null,
             "curso": 0,
-            "usuario": "0",
-            "usuhora": "0",
+            "usuario": null,
+            "usuhora": null,
             "usufecha": "2019-03-07T00:00:00",
             "exportado": 0,
             "enVenta": 0,
@@ -157,10 +250,10 @@ export default {
             "u9": 0,
             "u10": 0,
             "acaja": 0,
-            "modificaprecio": "0",
+            "modificaprecio": null,
             "fraccionario": 0,
             "iespecial": 0,
-            "ubicacion": "0",
+            "ubicacion": null,
             "c2": 0,
             "c3": 0,
             "c4": 0,
@@ -171,32 +264,32 @@ export default {
             "c9": 0,
             "c10": 0,
             "movimientos": 0,
-            "clasificacion": "0",
+            "clasificacion": null,
             "rop": 0,
             "rotacion": 0,
-            "clasifant": "0",
+            "clasifant": null,
             "eoq": 0,
             "etiquetas": 0,
-            "modelo": "0",
-            "color": "0",
-            "talla": "0",
+            "modelo": null,
+            "color": null,
+            "talla": null,
             "speso": 0,
-            "etiqueta": "0",
+            "etiqueta": null,
             "numero": 0,
             "carton": 0,
-            "ubicaetiq": "0",
-            "unidadrecibe": "0",
-            "unidadempaque": "0",
+            "ubicaetiq": null,
+            "unidadrecibe": null,
+            "unidadempaque": null,
             "sinvolumen": 0,
             "presentacion": 0,
             "servicio": 0,
             "numeroservicios": 0,
-            "claveproveedor": "0",
+            "claveproveedor": null,
             "dp": 0,
-            "familia": "0",
-            "subfamilia": "0",
-            "subfam1": "0",
-            "subfam2": "0",
+            "familia": null,
+            "subfamilia": null,
+            "subfam1": null,
+            "subfam2": null,
             "entradas": 0,
             "salidas": 0,
             "cantent": 0,
@@ -210,46 +303,66 @@ export default {
             "donativo": 0,
             "costopeps": 0,
             "costoueps": 0,
-            "contenido": "0",
-            "presentacionextra": "0",
+            "contenido": null,
+            "presentacionextra": null,
             "pesoextra": 0,
-            "autor": "0",
-            "tema": "0",
-            "editorial": "0",
-            "fabricante": "0",
+            "autor": null,
+            "tema": null,
+            "editorial": null,
+            "fabricante": "SYS",
             "preciousd": 0,
             "costousd": 0,
             "puntos": 0,
             "autocodigo": 0,
-            "inventariopiezas": 0,
-            "diasstockmaximo": 0,
-            "diasstockminimo": 0,
-            "requerimiento": 0,
+            "inventariopiezas": null,
+            "diasstockmaximo": null,
+            "diasstockminimo": null,
+            "requerimiento": null,
             "tiempoAire": 0,
             "ssmaTimeStamp": 'NULL',
             "ensambladoenlinea": 0,
-            "iepslitro": 0,
-            "clases": "0",
-            "claveprodserv": "",
-            "claveunidad": ""
+            "iepslitro": null,
+            "claveprodserv": null,
+            "claveunidad": null,
+            "lineaNavigation": null,
+            "marcaNavigation": null
         },
-         //Variable para la api
-        API_URL: 'prods/listar/kits'
+        //Variable para la api
+        API_URL: 'prods/'
     }),
-     created() {
+    computed: {
+        Titulo_dialogo() {
+            return this.Indice === -1 ? 'Agregar' : 'Editar';
+        }
+    },
+    created() {
         this.Listar();
     },
-    methods:{
-         Listar() {
+    methods: {
+        Listar() {
             this.Cargando = true;
             this.Kits = [];
-            axios.get(this.API_URL).then((response) => {
+            this.Productos = [];
+            axios.get(this.API_URL + "listark").then((response) => {
                 this.Kits = response.data;
                 this.Cargando = false;
             }).catch((error) => {
                 console.log(error);
                 this.Cargando = false;
             });
+            axios.get(this.API_URL + "listarnombre").then((response) => {
+                this.Productos = response.data;
+                this.Cargando = false;
+            }).catch((error) => {
+                console.log(error);
+                this.Cargando = false;
+            });
+        },
+        LOL(com) {
+            var index = this.Productos.findIndex(function (item, i) {
+                return item.articulo === com
+            });
+            this.Prods.push(this.Productos[index]);
         }
     }
 }

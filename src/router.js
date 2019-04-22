@@ -17,19 +17,34 @@ export default new Router({
       component: diferida('Home') 
     },
     {
-      path: '/about',
-      name: 'about',
-      component: diferida('About') 
-    },
-    {
       path: '/login',
       name: 'login',
       component: diferida('Login') 
     },
     {
       path: '/kits',
-      name: 'Kits',
+      name: 'kits',
       component: diferida('Kits') 
-    }
+    },
+    {
+      path: '/lineas',
+      name: 'lineas',
+      component: diferida('Lineas') 
+    },
+    {
+      path: '/marcas',
+      name: 'marcas',
+      component: diferida('Marcas') 
+    },
+    {
+      path: '/productos',
+      name: 'productos',
+      component: diferida('Productos') 
+    },
+    {
+      path: '/usuarios',
+      name: 'usuarios',
+      component: diferida('Usuarios') 
+    },
   ]
 })
