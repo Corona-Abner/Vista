@@ -37,16 +37,16 @@
                                             <v-text-field type="text" v-model="Item_editado.descrip" label="Descripcion" counter maxlength="50"></v-text-field>
                                         </v-flex>
                                         <v-flex xs6>
-                                            <v-select :items="Lineas" item-text="linea" v-model="Item_editado.linea" label="Linea"></v-select>
+                                            <v-select :items="Lineas" item-text="descrip" v-model="Item_editado.linea" label="Linea"></v-select>
                                         </v-flex>
                                         <v-flex xs6>
-                                            <v-select :items="Marcas" item-text="marca" v-model="Item_editado.marca" label="Marca"></v-select>
+                                            <v-select :items="Marcas" item-text="descrip" v-model="Item_editado.marca" label="Marca"></v-select>
                                         </v-flex>
                                         <v-flex xs6>
                                             <v-text-field type="number" :min="0" v-model="Item_editado.precio1" label="Precio"></v-text-field>
                                         </v-flex>
                                         <v-flex xs6>
-                                            <v-text-field type="number" :min="1" v-model="Item_editado.inventariopiezas" label="Cantidad"></v-text-field>
+                                            <v-text-field type="number" disabled :min="1" v-model="Item_editado.existencia" label="Cantidad"></v-text-field>
                                         </v-flex>
 
                                         <v-flex xs6>
@@ -58,10 +58,10 @@
 
                                         <!-- Checkboxes -->
 
-                                        <v-flex xs12>
+                                        <v-flex xs6>
                                             <v-checkbox color="primary" v-model="Item_editado.paraventa" label="Para venta"></v-checkbox>
                                         </v-flex>
-                                        <v-flex xs12>
+                                        <v-flex xs6>
                                             <v-checkbox color="primary" v-model="Item_editado.invent" label="Control inventario"></v-checkbox>
                                         </v-flex>
 
@@ -110,7 +110,7 @@
                         <td>{{ props.item.descrip }}</td>
                         <td>{{ props.item.linea}}</td>
                         <td>{{ props.item.marca }}</td>
-                        <td>${{ props.item.precio1 }} / {{ props.item.inventariopiezas }}</td>
+                        <td>${{props.item.precio1.toFixed(2)  }} / {{ props.item.existencia }}</td>
                         <td>
                             <!-- Boton editar -->
                             <v-icon small class="mr-2" @click="Editar(props.item)">
@@ -221,7 +221,7 @@ export default {
             "existencia": 0,
             "costoU": 0,
             "costo": 0,
-            "unidad": null,
+            "unidad": 'PZA',
             "porRecib": 0,
             "porSurt": 0,
             "impuesto": "IVA",
@@ -350,6 +350,7 @@ export default {
         Dialogo(valor) {
             valor || this.Cerrar()
         }
+        
     },
     //Cuando se crea la vista
     created() {
@@ -452,7 +453,7 @@ export default {
                 this.Validacion = true;
             }
             if (this.Item_editado.descrip.length > 50) {
-                this.Mensajes.push(">La descripcion debe tener entre 5 y 50 caracteres");
+                this.Mensajes.push(">La descripcion debe tener menos de 50 caracteres");
                 this.Validacion = true;
             }
             if (this.Item_editado.linea == '') {
@@ -464,7 +465,7 @@ export default {
                 this.Validacion = true;
             }
             if (this.Item_editado.claveprodserv.length < 3 || this.Item_editado.claveprodserv.length > 10) {
-                this.Mensajes.push(">La clave de servicio debe tener entre 3 y 1caracteres");
+                this.Mensajes.push(">La clave de servicio debe tener entre 3 y 10 caracteres");
                 this.Validacion = true;
             }
             if (this.Item_editado.claveunidad.length < 3 || this.Item_editado.claveunidad.length > 10) {
@@ -485,138 +486,138 @@ export default {
             this.Validacion = false;
             this.Mensajes = [];
             this.Item_editado = {
-                "articulo": '',
-                "descrip": '',
-                "linea": '',
-                "marca": '',
-                "precio1": 0,
-                "precio2": 0,
-                "precio3": 0,
-                "precio4": 0,
-                "precio5": 0,
-                "precio6": 0,
-                "precio7": 0,
-                "precio8": 0,
-                "precio9": 0,
-                "precio10": 0,
-                "existencia": 0,
-                "costoU": 0,
-                "costo": 0,
-                "unidad": null,
-                "porRecib": 0,
-                "porSurt": 0,
-                "impuesto": "IVA",
-                "minimo": 0,
-                "maximo": 0,
-                "observ": null,
-                "costoStd": 0,
-                "kit": 0,
-                "serie": 0,
-                "lote": 0,
-                "invent": 1,
-                "imagen": null,
-                "paraventa": 1,
-                "url": null,
-                "curso": 0,
-                "usuario": null,
-                "usuhora": null,
-                "usufecha": "2019-03-07T00:00:00",
-                "exportado": 0,
-                "enVenta": 0,
-                "recalcular": 0,
-                "granel": 0,
-                "peso": 0,
-                "bajoCosto": 0,
-                "bloqueado": 0,
-                "u1": 0,
-                "u2": 0,
-                "u3": 0,
-                "u4": 0,
-                "u5": 0,
-                "u6": 0,
-                "u7": 0,
-                "u8": 0,
-                "u9": 0,
-                "u10": 0,
-                "acaja": 0,
-                "modificaprecio": null,
-                "fraccionario": 0,
-                "iespecial": 0,
-                "ubicacion": null,
-                "c2": 0,
-                "c3": 0,
-                "c4": 0,
-                "c5": 0,
-                "c6": 0,
-                "c7": 0,
-                "c8": 0,
-                "c9": 0,
-                "c10": 0,
-                "movimientos": 0,
-                "clasificacion": null,
-                "rop": 0,
-                "rotacion": 0,
-                "clasifant": null,
-                "eoq": 0,
-                "etiquetas": 0,
-                "modelo": null,
-                "color": null,
-                "talla": null,
-                "speso": 0,
-                "etiqueta": null,
-                "numero": 0,
-                "carton": 0,
-                "ubicaetiq": null,
-                "unidadrecibe": null,
-                "unidadempaque": null,
-                "sinvolumen": 0,
-                "presentacion": 0,
-                "servicio": 0,
-                "numeroservicios": 0,
-                "claveproveedor": null,
-                "dp": 0,
-                "familia": null,
-                "subfamilia": null,
-                "subfam1": null,
-                "subfam2": null,
-                "entradas": 0,
-                "salidas": 0,
-                "cantent": 0,
-                "cantsal": 0,
-                "pronostico": 0,
-                "oferta": 0,
-                "costoentrada": 0,
-                "costosalida": 0,
-                "unidadesentrada": 0,
-                "unidadessalida": 0,
-                "donativo": 0,
-                "costopeps": 0,
-                "costoueps": 0,
-                "contenido": null,
-                "presentacionextra": null,
-                "pesoextra": 0,
-                "autor": null,
-                "tema": null,
-                "editorial": null,
-                "fabricante": "SYS",
-                "preciousd": 0,
-                "costousd": 0,
-                "puntos": 0,
-                "autocodigo": 0,
-                "inventariopiezas": null,
-                "diasstockmaximo": null,
-                "diasstockminimo": null,
-                "requerimiento": null,
-                "tiempoAire": 0,
-                "ssmaTimeStamp": 'NULL',
-                "ensambladoenlinea": 0,
-                "iepslitro": null,
-                "claveprodserv": null,
-                "claveunidad": null,
-                "lineaNavigation": null,
-                "marcaNavigation": null
-            };
-        },
+            "articulo": '',
+            "descrip": '',
+            "linea": '',
+            "marca": '',
+            "precio1": 0,
+            "precio2": 0,
+            "precio3": 0,
+            "precio4": 0,
+            "precio5": 0,
+            "precio6": 0,
+            "precio7": 0,
+            "precio8": 0,
+            "precio9": 0,
+            "precio10": 0,
+            "existencia": 0,
+            "costoU": 0,
+            "costo": 0,
+            "unidad": 'PZA',
+            "porRecib": 0,
+            "porSurt": 0,
+            "impuesto": "IVA",
+            "minimo": 0,
+            "maximo": 0,
+            "observ": null,
+            "costoStd": 0,
+            "kit": 0,
+            "serie": 0,
+            "lote": 0,
+            "invent": 1,
+            "imagen": null,
+            "paraventa": 1,
+            "url": null,
+            "curso": 0,
+            "usuario": null,
+            "usuhora": null,
+            "usufecha": "2019-03-07T00:00:00",
+            "exportado": 0,
+            "enVenta": 0,
+            "recalcular": 0,
+            "granel": 0,
+            "peso": 0,
+            "bajoCosto": 0,
+            "bloqueado": 0,
+            "u1": 0,
+            "u2": 0,
+            "u3": 0,
+            "u4": 0,
+            "u5": 0,
+            "u6": 0,
+            "u7": 0,
+            "u8": 0,
+            "u9": 0,
+            "u10": 0,
+            "acaja": 0,
+            "modificaprecio": null,
+            "fraccionario": 0,
+            "iespecial": 0,
+            "ubicacion": null,
+            "c2": 0,
+            "c3": 0,
+            "c4": 0,
+            "c5": 0,
+            "c6": 0,
+            "c7": 0,
+            "c8": 0,
+            "c9": 0,
+            "c10": 0,
+            "movimientos": 0,
+            "clasificacion": null,
+            "rop": 0,
+            "rotacion": 0,
+            "clasifant": null,
+            "eoq": 0,
+            "etiquetas": 0,
+            "modelo": null,
+            "color": null,
+            "talla": null,
+            "speso": 0,
+            "etiqueta": null,
+            "numero": 0,
+            "carton": 0,
+            "ubicaetiq": null,
+            "unidadrecibe": null,
+            "unidadempaque": null,
+            "sinvolumen": 0,
+            "presentacion": 0,
+            "servicio": 0,
+            "numeroservicios": 0,
+            "claveproveedor": null,
+            "dp": 0,
+            "familia": null,
+            "subfamilia": null,
+            "subfam1": null,
+            "subfam2": null,
+            "entradas": 0,
+            "salidas": 0,
+            "cantent": 0,
+            "cantsal": 0,
+            "pronostico": 0,
+            "oferta": 0,
+            "costoentrada": 0,
+            "costosalida": 0,
+            "unidadesentrada": 0,
+            "unidadessalida": 0,
+            "donativo": 0,
+            "costopeps": 0,
+            "costoueps": 0,
+            "contenido": null,
+            "presentacionextra": null,
+            "pesoextra": 0,
+            "autor": null,
+            "tema": null,
+            "editorial": null,
+            "fabricante": "SYS",
+            "preciousd": 0,
+            "costousd": 0,
+            "puntos": 0,
+            "autocodigo": 0,
+            "inventariopiezas": null,
+            "diasstockmaximo": null,
+            "diasstockminimo": null,
+            "requerimiento": null,
+            "tiempoAire": 0,
+            "ssmaTimeStamp": 'NULL',
+            "ensambladoenlinea": 0,
+            "iepslitro": null,
+            "claveprodserv": null,
+            "claveunidad": null,
+            "lineaNavigation": null,
+            "marcaNavigation": null
+        };
+        }
     }
 }
 </script>
