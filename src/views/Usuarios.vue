@@ -36,7 +36,7 @@
                                         </v-flex>
                                         <v-flex xs12 sm12 md12>
                                             <v-form>
-                                                <v-text-field :disabled="!Item_editado.supervisor" v-model="Item_editado.clave" label="Contraseña" type="password" counter maxlength="8">
+                                                <v-text-field :disabled="!Item_editado.supervisor" v-model="Pass" label="Contraseña" type="password" counter maxlength="8">
                                                 </v-text-field>
                                             </v-form>
                                         </v-flex>
@@ -44,12 +44,16 @@
                                             <v-text-field type="text" v-model="Item_editado.nombre" autocomplete="new-password" label="Nombre" counter maxlength="20"></v-text-field>
                                         </v-flex>
 
-                                        <v-flex xs12>
+                                        <v-flex xs6>
                                             <v-text-field type="text" v-model="Item_editado.area" label="Area" counter maxlength="15"></v-text-field>
+                                        </v-flex>
+                                        <v-flex xs6>
+                                            <v-select v-model="Item_editado.tipo" :items="tipos"  label="Tipo"></v-select>
                                         </v-flex>
                                         <v-flex xs3>
                                             <v-checkbox v-model="Item_editado.supervisor" color="primary" :label="`Supervisor`"></v-checkbox>
                                         </v-flex>
+                                        
                                         <!-- Mensaje de validacion -->
                                         <v-flex xs12 v-show="Validacion">
                                             <div class="red--text" v-for="Mensaje in Mensajes" :key="Mensaje" v-text="Mensaje">
@@ -144,6 +148,7 @@ import axios from 'axios';
 export default {
     //Datos a utilizar en la vista
     data: () => ({
+        Pass:'',
         //Valor para hace una busqueda 
         Busqueda: '',
         //Valor para mostrar el dialogo de editar y agregar
@@ -161,6 +166,8 @@ export default {
         Usuarios: [],
         Lineas: [],
         Marcas: [],
+        tipos:['administrador','informatica','usuario' ],
+        
         //Encabezados para la tabla de la pestaña 1
         Encabezados: [{
                 text: 'Usuario',
@@ -214,11 +221,11 @@ export default {
             "vendedor": 'SYS',
             "surtirpedidos": 0,
             "cobrador": 'SYS',
-            "passwordHash": null,
-            "passwordSalt": null,
-            "tipo": null
+            "password_Hash": null,
+            "password_Salt": null,
+            "tipo": ''
         },
-
+        Item_copia:[],
         //Variable para la api
         API_URL: 'usuarios/'
     }),
@@ -236,6 +243,7 @@ export default {
     },
     //Cuando se crea la vista
     created() {
+        this.Item_copia ==JSON.parse(JSON.stringify( this.Item_editado)); 
         this.Listar();
     },
     //Metodos
@@ -255,7 +263,8 @@ export default {
         //metodo para editar un elemento
         Editar(item) {
             this.Indice = this.Usuarios.indexOf(item);
-            this.Item_editado = item;
+            
+            this.Item_editado =JSON.parse(JSON.stringify( item)); 
             this.Dialogo = true;
         },
         //metodo para eliminar un elemento
@@ -284,13 +293,10 @@ export default {
             if (this.Validacion) {
                 return
             }
-            if(!this.Item_editado.supervisor){
-                 this.Item_editado.clave="";
-            }
             //Validar
             if (this.Indice > -1) {
                 //Editar
-                axios.put(this.API_URL + this.Item_editado.usuario, this.Item_editado).then((response) => {
+                axios.put(this.API_URL + this.Item_editado.usuario+"/"+this.Pass, this.Item_editado).then((response) => {
                     this.Cerrar();
                     this.Limpiar();
                     this.Listar();
@@ -299,7 +305,7 @@ export default {
                 });
             } else {
                 //agregar
-                axios.post(this.API_URL, this.Item_editado).then((response) => {
+                axios.post(this.API_URL+this.Pass, this.Item_editado).then((response) => {
                     this.Cerrar();
                     this.Limpiar();
                     this.Listar();
@@ -324,17 +330,21 @@ export default {
                 this.Validacion = true;
             }
             if (this.Item_editado.supervisor) {
-                if (this.Item_editado.clave.length < 3 || this.Item_editado.clave.length > 8) {
+                if (this.Pass.length < 3 || this.Pass.length > 8) {
                     this.Mensajes.push(">La contraseña debe tener entre 3 y 8 caracteres");
                     this.Validacion = true;
                 }
             }
-            if (this.Item_editado.nombre.length < 5 || this.Item_editado.nombre.length > 20) {
-                this.Mensajes.push(">El nombre debe tener entre 5 y 20 caracteres");
+              if (this.Item_editado.tipo=='' || this.Item_editado.tipo==null ) {
+                this.Mensajes.push(">Elija el tipo de usuario");
+                    this.Validacion = true;
+            }
+            if (this.Item_editado.nombre.length <=3 || this.Item_editado.nombre.length > 20) {
+                this.Mensajes.push(">El nombre debe tener entre 3 y 20 caracteres");
                 this.Validacion = true;
             }
-            if (this.Item_editado.area.length < 3 || this.Item_editado.area.length > 10) {
-                this.Mensajes.push(">El area debe tener entre 3 y 10 caracteres");
+            if (this.Item_editado.area.length < 3 || this.Item_editado.area.length > 15) {
+                this.Mensajes.push(">El area debe tener entre 3 y 15 caracteres");
                 this.Validacion = true;
             }
             //Verifica si el nombre esta repetido
@@ -350,39 +360,7 @@ export default {
             this.Indice = -1;
             this.Validacion = false;
             this.Mensajes = [];
-            this.Item_editado = {
-                "usuario": '',
-                "clave": '',
-                "nombre": '',
-                "area": '',
-                "derechos": 0,
-                "foto": null,
-                "supervisor": 1,
-                "activos": 0,
-                "sacar": 0,
-                "opera": 0,
-                "facturar": 0,
-                "cobrar": 0,
-
-                "facturas": 0,
-                "devoluc": 0,
-                "pagos": 0,
-                "cotiza": 0,
-                "cobranza": 0,
-                "camfecha": 0,
-                "numpoliza": 0,
-                "periodos": 0,
-                "modificaprecio": 0,
-                "existencia": 0,
-                "existsalidas": 0,
-                "gerenciales": 0,
-                "vendedor": 'SYS',
-                "surtirpedidos": 0,
-                "cobrador": 'SYS',
-                "passwordHash": null,
-                "passwordSalt": null,
-                "tipo": null
-            };
+            this.Item_editado ==JSON.parse(JSON.stringify( this.Item_copia)); 
 
         },
     }

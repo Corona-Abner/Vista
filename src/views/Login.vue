@@ -10,7 +10,7 @@
                 <!-- Parte de arriba de la carta -->
                 <v-toolbar color="blue darken-1">
                     <!-- Titulo -->
-                    <v-toolbar-title >
+                    <v-toolbar-title>
                         Iniciar sesión
                     </v-toolbar-title>
                 </v-toolbar>
@@ -21,11 +21,7 @@
                         <v-text-field v-model="login.usuario" prepend-icon="person" autoComplete="username" label="Usuario"></v-text-field>
                         <!-- Input de contraseña -->
                         <v-text-field v-model="login.clave" prepend-icon="lock" autoComplete="current-password" label="Contraseña" type="password"></v-text-field>
-                        <v-flex xs12 v-if="error">
-                            <div class="red--text">
-                                {{error}}
-                            </div>
-                        </v-flex>
+
                     </v-form>
                 </v-card-text>
                 <!-- Botonrs de la carta -->
@@ -42,27 +38,75 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
     data: () => ({
         login: {
             usuario: '',
             clave: ''
         },
-        error: null,
         API_URL: 'usuarios/login'
     }),
+    created() {
+        if (this.$store.state.Login.usuario != '') {
+            this.$router.push({
+                name: 'home'
+            });
+        }
+    },
     methods: {
-        Mostrar() {
-            
-            this.$store.commit("mostrarSnack", {
-                titulo: 'Iniciando Sesión',
-                estado: true,
-                tiempo: 1000,
-                color:'error',
-                modo:'verti'
+       async Mostrar() {
+            this.error = null;
+            this.$store.commit("mostrarLoading", {
+                titulo: "Iniciando Sesion",
+                estado: true
+            });
+           await axios.post(this.API_URL, this.login).then((response) => {
+                this.$store.dispatch("guardarToken", response.data.token)
+                this.$router.push({
+                    name: 'home'
+                })
+                this.$store.commit("ocultarLoading");
+            }).catch((err) => {
+
+                if (err.message === "Network Error"){this.$store.commit("mostrarSnack", {
+                        titulo: "Server Ocupado",
+                        estado: true,
+                        tiempo: 3000,
+                        color: 'error',
+                        modo: 'verti'
+                    });}
+                else{ if (err.response.status == 400) {
+                    this.$store.commit("mostrarSnack", {
+                        titulo: "Introduce el usuario y la contraseña",
+                        estado: true,
+                        tiempo: 3000,
+                        color: 'error',
+                        modo: 'verti'
+                    });
+                };
+                if (err.response.status == 401) {
+                    this.$store.commit("mostrarSnack", {
+                        titulo: "No tiene permisos para entrar",
+                        estado: true,
+                        tiempo: 3000,
+                        color: 'error',
+                        modo: 'verti'
+                    });
+                };
+                if (err.response.status == 404) {
+                    this.$store.commit("mostrarSnack", {
+                        titulo: "Usuario y/o contraseña incorrectos",
+                        estado: true,
+                        tiempo: 3000,
+                        color: 'error',
+                        modo: 'verti'
+                    });
+                };}
+               
+                this.$store.commit("ocultarLoading");
             });
         }
     }
-
 }
 </script>
